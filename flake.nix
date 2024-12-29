@@ -9,24 +9,30 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
-    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+
+  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+    nixosConfigurations.beast = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+
+
       system = "x86_64-linux";
       modules = [
-        ./configuration.nix
-        ./modules/boot.nix
-        ./modules/networking.nix
-        ./modules/locale.nix
-        ./modules/desktop.nix
+        ./machines/superbeast.nix
+        ./modules/superbeast_specific.nix
+        ./modules/wifi.nix
+        ./modules/1password.nix
+        ./modules/base.nix
+        ./modules/base_packages.nix
+        ./modules/gui.nix
         ./modules/audio.nix
         ./modules/users.nix
-        ./modules/packages.nix
-        home-manager.nixosModules.home-manager
+        ./modules/locale.nix
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.jfinlays = import ./home.nix;
         }
+        home-manager.nixosModules.home-manager
       ];
     };
   };

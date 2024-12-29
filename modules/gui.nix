@@ -13,4 +13,17 @@
   services.displayManager.autoLogin.user = "jfinlays";
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
+
+  programs.firefox.enable = true;
+
+
+  nixpkgs.config.allowUnfree = true;
+  environment.systemPackages = with pkgs; [
+    vscode 
+    firefox
+    gparted
+    google-chrome
+  ];
+
+  
 }
