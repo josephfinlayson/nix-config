@@ -4,8 +4,10 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
+
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "sd_mod" ];
@@ -13,16 +15,7 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/f074dadc-4f64-476b-abc4-c3127ae29fb6";
-      fsType = "ext4";
-    };
-
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/814E-1EC1";
-      fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
-    };
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   swapDevices = [ ];
 
@@ -32,7 +25,68 @@
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
+  system.stateVersion = "24.05";
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PermitRootLogin = "yes";
+      PasswordAuthentication = true;
+    };
+  };
+  networking.firewall.allowedTCPPorts = [ 22 ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  disko.devices = {
+    disk = {
+      main = {
+        device = "/dev/disk/by-id/ata-SAMSUNG_SSD_SM871_2.5_7mm_256GB_S2D2NXAGB26911";
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions = {
+            boot = {
+              size = "512M";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+              };
+            };
+            root = {
+              size = "100%";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/";
+              };
+            };
+          };
+        };
+      };
+      nvme = {
+        device = "/dev/disk/by-id/nvme-HFM128GDHTNG-8310B_CJ9AN8675102YB52P";
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions = {
+            nix-store = {
+              size = "100%";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/nix/store";
+              };
+            };
+          };
+        };
+      };
+    };
+  };
 }

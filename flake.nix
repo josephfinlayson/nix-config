@@ -2,23 +2,25 @@
   description = "NixOS configuration";
 
   inputs = {
+      disko.url = "github:nix-community/disko";
+
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
         pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
 
   };
 
-  outputs = { self, sops-nix, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, sops-nix, nixpkgs, home-manager, disko, ... }@inputs:
     let
       baseModules = [
         ./modules/sops.nix
@@ -27,8 +29,6 @@
         ./modules/1password.nix
         ./modules/base.nix
         ./modules/base_packages.nix
-        ./modules/gui.nix
-        ./modules/audio.nix
         ./modules/users.nix
         ./modules/locale.nix
         {
@@ -45,7 +45,9 @@
           specialArgs = { inherit inputs; };
           system = "x86_64-linux";
           modules = baseModules ++ [
+            ./modules/gui.nix
             ./machines/superbeast.nix
+            ./modules/audio.nix
             ./modules/superbeast_specific.nix
           ];
         };
@@ -56,6 +58,8 @@
           modules = baseModules ++ [
             ./machines/minifriend.nix
             ./modules/k3s-server.nix
+            disko.nixosModules.disko
+
           ];
         };
       };

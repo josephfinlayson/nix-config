@@ -16,5 +16,17 @@
     home-manager
     nil
     k9s
+    fluxcd
+    # kubernetes-helm
+    kompose
+    k9s
+    kubectl
+    sops
+    kustomize
+    cloudflared
+    nixos-anywhere
+    xclip
+    # nixos-generators
+
   ];
 }
