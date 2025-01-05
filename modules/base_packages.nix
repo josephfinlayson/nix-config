@@ -2,6 +2,8 @@
 
 {
 
+  programs.usbtop.enable = true;
+  
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     vscode
@@ -29,4 +31,6 @@
     # nixos-generators
 
   ];
+
+
 }

@@ -15,8 +15,9 @@
       fsType = "ext4";
     };
 
-  fileSystems."/boot" =
-    { device = "/dev/nvme0n1p1";
+
+      fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/7E8B-C9BA";
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" ];
     };

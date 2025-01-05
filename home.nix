@@ -31,6 +31,13 @@
       #   bindkey '^[OB' history-beginning-search-forward
       #   bindkey '^[[B' history-beginning-search-forward
       # '';
+
+  # set environment variables
+  environment.variables = {
+    GH_TOKEN = "${config.sops.secrets.gh_token}";
+  };
+
+
     zplug = {
       enable = true;
      plugins = [
@@ -54,6 +61,7 @@
   # }
   # ];
   
+
 
 
 services.gammastep = {
